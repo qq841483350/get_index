@@ -1,0 +1,46 @@
+#coding:utf8
+#批量查询关键词指数数据  数据来源站长之家
+import requests,re,time,sys
+reload(sys)
+sys.setdefaultencoding('utf8')
+def get_index(word):
+    today_date=time.strftime('%Y-%m-%d')
+    url="http://index.chinaz.com/?words=%s"%word
+    try:
+        html=requests.get(url).content
+        html=re.sub(',','',html)
+        html=re.sub(' col-gray','',html)
+        html=re.sub('未收录','0',html)
+        try:
+            indexs=re.findall('<strong class="fz20 tot">(.*?)</strong>',html)
+
+            zhishu_quanwang=int(indexs[0])  #全网指数
+            zhishu_baidu=int(indexs[1])+int(indexs[2])  #百度总指数
+            zhishu_baidu_pc=int(indexs[1])  #PC搜索指数
+            zhishu_baidu_yd=int(indexs[2]) #移动搜索指数
+            zhishu_360=int(indexs[3]) #360搜索指数
+            zhishu_sogou_pc=int(indexs[4]) #搜狗PC指数
+            zhishu_sogou_yd=int(indexs[5]) #搜狗移动指数
+            zhishu_weixin=int(indexs[6]) #微信指数
+
+            # return zhishu_quanwang,zhishu_baidu,zhishu_baidu_pc,zhishu_baidu_yd,zhishu_360,zhishu_sogou_pc,zhishu_sogou_yd,zhishu_weixin,today_date
+            print "【关键词:",word.strip(),'】',today_date
+            print '全网指数',zhishu_quanwang
+            print '百度总指数',zhishu_baidu
+            print 'PC搜索指数',zhishu_baidu_pc
+            print '移动搜索指数',zhishu_baidu_yd
+            print '360搜索指数',zhishu_360
+            print '搜狗PC指数',zhishu_sogou_pc
+            print '搜狗移动指数',zhishu_sogou_yd
+            print '微信指数',zhishu_weixin,'\n'
+        except:
+            print '关键词：',word,'未收录'
+    except:
+        print '网页无法打开',url
+        pass
+
+
+if __name__=="__main__":
+    with open(u'关键词.txt','r') as word:
+        for word in word.readlines():
+            get_index(word)
